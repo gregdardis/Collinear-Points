@@ -16,6 +16,7 @@ public class BruteCollinearPoints {
     private LineSegment[] lineSegments;
     
     public BruteCollinearPoints(Point[] points) {
+        checkForNullOrRepeatedPoints(points);
         
         ArrayList<LineSegment> segments = new ArrayList<>();
         
@@ -35,6 +36,28 @@ public class BruteCollinearPoints {
             }
         }
         lineSegments = segments.toArray(new LineSegment[segments.size()]);
+    }
+    
+    /**
+     * Throws an IllegalArgumentException in the following cases:
+     * The points array is null.
+     * Any point in the points array is null.
+     * Any two points in the points array are the same point.
+     * 
+     * @param points    Points array
+     */
+    private void checkForNullOrRepeatedPoints(Point[] points) {
+        if (points == null || points[points.length - 1] == null) {
+            throw new IllegalArgumentException("Either the points array is null or the last point in the array is null");
+        }
+        for (int i = 0; i < points.length - 1; i++) {
+            if (points[i] == null) throw new IllegalArgumentException();
+            for (int j = i + 1; j < points.length; j++) {
+                if (points[i].compareTo(points[j]) == 0) {
+                    throw new IllegalArgumentException("Two points in the array are the same.");
+                }
+            }
+        }
     }
     
     public int numberOfSegments() {
