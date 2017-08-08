@@ -23,18 +23,15 @@ public class BruteCollinearPoints {
         checkForNullOrRepeatedPoints(points);
         ArrayList<LineSegment> segments = new ArrayList<>();
         
-        Point[] pointsSorted = Arrays.copyOf(points, points.length);
-        Arrays.sort(pointsSorted);
+        Arrays.sort(points);
         
-        for (int p = 0; p < pointsSorted.length - 3 ; p++) {
-            for (int q = p + 1; q < pointsSorted.length - 2; q++) {
-                for (int r = q + 1; r < pointsSorted.length - 1; r++) {
-                    for (int s = r + 1; s < pointsSorted.length; s++) {
-                        if (pointsSorted[p].slopeTo(pointsSorted[q]) == pointsSorted[p].slopeTo(pointsSorted[r]) && 
-                                pointsSorted[p].slopeTo(pointsSorted[q]) == pointsSorted[p].slopeTo(pointsSorted[s])) {
-                            System.out.println("pointsSorted[p].slopeTo(pointsSorted[q]): " + pointsSorted[p].slopeTo(pointsSorted[q]));
-                            // how do we know if p and s are the opposite ends of the line segment? i'm not sure we do... maybe sorting fixed that?
-                            segments.add(new LineSegment(pointsSorted[p], pointsSorted[s]));
+        for (int p = 0; p < points.length - 3 ; p++) {
+            for (int q = p + 1; q < points.length - 2; q++) {
+                for (int r = q + 1; r < points.length - 1; r++) {
+                    for (int s = r + 1; s < points.length; s++) {
+                        if (points[p].slopeTo(points[q]) == points[p].slopeTo(points[r]) && 
+                                points[p].slopeTo(points[q]) == points[p].slopeTo(points[s])) {
+                            segments.add(new LineSegment(points[p], points[s]));
                         }
                     }
                 }
