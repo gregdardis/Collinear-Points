@@ -13,58 +13,74 @@ import java.util.Arrays;
  */
 public class BruteCollinearPoints {
     
-    private LineSegment[] lineSegments;
+    private final ArrayList<LineSegment> segments = new ArrayList<>();
     
     public BruteCollinearPoints(Point[] points) {
-        checkForNullOrRepeatedPoints(points);
-        ArrayList<LineSegment> segments = new ArrayList<>();
+        if (points == null) {
+            throw new IllegalArgumentException("Points array is null");
+        }
         
-        // possibly supposed to copy array and sort that instead and use that below
-        Arrays.sort(points);
+        Point[] pointsCopy = Arrays.copyOf(points, points.length);
+        Arrays.sort(pointsCopy);
         
-        for (int p = 0; p < points.length - 3 ; p++) {
-            for (int q = p + 1; q < points.length - 2; q++) {
-                for (int r = q + 1; r < points.length - 1; r++) {
-                    for (int s = r + 1; s < points.length; s++) {
-                        if (points[p].slopeTo(points[q]) == points[p].slopeTo(points[r]) && 
-                                points[p].slopeTo(points[q]) == points[p].slopeTo(points[s])) {
-                            segments.add(new LineSegment(points[p], points[s]));
+        if (hasNullPoint(pointsCopy)) {
+            throw new IllegalArgumentException("Null point in points array");
+        }
+        if (hasDuplicate(pointsCopy)) {
+            throw new IllegalArgumentException("Duplicate points exist");
+        }
+        
+        for (int p = 0; p < pointsCopy.length - 3; p++) {
+            for (int q = p + 1; q < pointsCopy.length - 2; q++) {
+                for (int r = q + 1; r < pointsCopy.length - 1; r++) {
+                    for (int s = r + 1; s < pointsCopy.length; s++) {
+                        if (pointsCopy[p].slopeTo(pointsCopy[q]) == pointsCopy[p].slopeTo(pointsCopy[r]) && 
+                                pointsCopy[p].slopeTo(pointsCopy[q]) == pointsCopy[p].slopeTo(pointsCopy[s])) {
+                            segments.add(new LineSegment(pointsCopy[p], pointsCopy[s]));
                         }
                     }
                 }
             }
         }
-        lineSegments = segments.toArray(new LineSegment[segments.size()]);
     }
     
     /**
-     * Throws an IllegalArgumentException in the following cases:
-     * The points array is null.
-     * Any point in the points array is null.
-     * Any two points in the points array are the same point.
+     * Compares a point in the sorted points array to the entry next to it to make sure
+     * they are not the same point.
      * 
-     * @param points    Points array
+     * @param points    Sorted points array
+     * @return  True if the array has duplicate points, false otherwise
      */
-    private void checkForNullOrRepeatedPoints(Point[] points) {
-        if (points == null || points[points.length - 1] == null) {
-            throw new IllegalArgumentException("Either the points array is null or the last point in the array is null");
-        }
+    private boolean hasDuplicate(Point[] points) {
         for (int i = 0; i < points.length - 1; i++) {
-            if (points[i] == null) throw new IllegalArgumentException();
-            for (int j = i + 1; j < points.length; j++) {
-                if (points[i].compareTo(points[j]) == 0) {
-                    throw new IllegalArgumentException("Two points in the array are the same.");
-                }
+            if (points[i].compareTo(points[i + 1]) == 0) {
+                return true;
             }
         }
+        return false;
+    }
+    
+    /**
+     * Checks every element in an array of points to see if any of them are null
+     * 
+     * @param points    Points array
+     * @return  True if the array has a null point, false otherwise
+     */
+    private boolean hasNullPoint(Point[] points) {
+        for (int i = 0; i < points.length; i++) {
+            if (points[i] == null){
+                return true;
+            }
+        }
+        return false;
     }
     
     public int numberOfSegments() {
-        return lineSegments.length;
+        return segments.size();
     }
     
     public LineSegment[] segments() {
-        return lineSegments;
+        return segments.toArray(new LineSegment[segments.size()]);
     }
     
 }

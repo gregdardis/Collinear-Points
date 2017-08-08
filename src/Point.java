@@ -81,29 +81,44 @@ public class Point implements Comparable<Point> {
         if (this.x == that.x && this.y == that.y) return 0;
         if (this.y < that.y) return -1;
         if (this.y == that.y && this.x < that.x) return -1;
-        else return 1;
+        return 1;
     }
 
-    /**
-     * Compares two points by the slope they make with this point.
-     * The slope is defined as in the slopeTo() method.
-     *
-     * @return the Comparator that defines this ordering on points
-     */
+//    /**
+//     * Compares two points by the slope they make with this point.
+//     * The slope is defined as in the slopeTo() method.
+//     *
+//     * @return the Comparator that defines this ordering on points
+//     */
+//    public Comparator<Point> slopeOrder() {
+//        return new Comparator<Point>() {
+//            @Override
+//            public int compare(Point p1, Point p2) {
+//                double slopeDiff = slopeTo(p1) - slopeTo(p2);
+//                if (slopeDiff > 0) {
+//                    return 1;
+//                } else if (slopeDiff < 0) {
+//                    return -1;
+//                } else {
+//                    return 0;
+//                }
+//            }
+//        };
+//    }
+    
     public Comparator<Point> slopeOrder() {
-        return new Comparator<Point>() {
-            @Override
-            public int compare(Point p1, Point p2) {
-                double slopeDiff = slopeTo(p1) - slopeTo(p2);
-                if (slopeDiff > 0) {
-                    return 1;
-                } else if (slopeDiff < 0) {
-                    return -1;
-                } else {
-                    return 0;
-                }
-            }
-        };
+        return new PointComparator();
+    }
+    
+    private class PointComparator implements Comparator<Point> {
+        
+        @Override
+        public int compare(Point p1, Point p2) {
+            double slope1 = slopeTo(p1);
+            double slope2 = slopeTo(p2);
+            
+            return Double.compare(slope1,  slope2);
+        }
     }
 
 

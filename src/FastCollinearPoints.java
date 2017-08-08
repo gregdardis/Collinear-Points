@@ -7,68 +7,79 @@ import edu.princeton.cs.algs4.StdOut;
 
 public class FastCollinearPoints {
     
-    private LineSegment[] lineSegments;
+    private final ArrayList<LineSegment> segments = new ArrayList<>();
     
     public FastCollinearPoints(Point[] points) {
-        checkForNullOrRepeatedPoints(points);
-        double[] slopeToP = new double[points.length];
-        ArrayList<LineSegment> segments = new ArrayList<>();
-        
-        for (int i = 0; i < points.length; i++) {
-            Point p = points[i];
-            
-            // determine slope q makes with p
-            for (int j = 0; j < points.length; j++) {
-                slopeToP[j] = p.slopeTo(points[j]);
-            }
-            // sort points according to slope they make with p
-            Arrays.sort(slopeToP);
-            
-            // check if any 3+ adjacent points in the sorted array have equal slopes
-            // if so, these points and p are collinear. 
-            for (int k = 0; k < slopeToP.length - 2; k++) {
-                if (slopeToP[k] == slopeToP[k+1] && slopeToP[k+1] == slopeToP[k+2]) {
-                    if (slopeToP[k+2] != slopeToP[k+3]) {
-                        // thats 3 adjacent points in a row, they are collinear with p
-                        segments.add(new LineSegment(p, points[k+2]));
-                    } else {
-                        // check if there are more than 3 in a row, and include them in collinearity
-                    }
-                }
-            }
-            
+        if (points == null) {
+            throw new IllegalArgumentException("Points array is null");
         }
         
+        Point[] pointsCopy = points.clone();
+        Arrays.sort(pointsCopy);
+        if (hasNullPoint(pointsCopy)) {
+            throw new IllegalArgumentException("Null point in points array");
+        }
+        if (hasDuplicate(pointsCopy)) {
+            throw new IllegalArgumentException("Duplicate points exist");
+        }
+        
+        for (int i = 0; i < pointsCopy.length - 3; i++) {
+            Arrays.sort(pointsCopy);
+            Arrays.sort(pointsCopy, pointsCopy[i].slopeOrder());
+            
+            for (int p = 0, first = 1, last = 2; last < pointsCopy.length; last++) {
+                
+                while (last < pointsCopy.length &&
+                        Double.compare(pointsCopy[p].slopeTo(pointsCopy[first]), pointsCopy[p].slopeTo(pointsCopy[last])) == 0) {
+                    last++;
+                }
+                
+                if (last - first >= 3 && pointsCopy[p].compareTo(pointsCopy[first]) < 0) {
+                    segments.add(new LineSegment(pointsCopy[p], pointsCopy[last - 1]));
+                }
+                
+                first = last;
+            }
+        }
     }
     
     public int numberOfSegments() {
-        return lineSegments.length;
+        return segments.size();
     }
     
     public LineSegment[] segments() {
-        return lineSegments;
+        return segments.toArray(new LineSegment[segments.size()]);
     }
     
     /**
-     * Throws an IllegalArgumentException in the following cases:
-     * The points array is null.
-     * Any point in the points array is null.
-     * Any two points in the points array are the same point.
+     * Compares a point in the sorted points array to the entry next to it to make sure
+     * they are not the same point.
      * 
-     * @param points    Points array
+     * @param points    Sorted points array
+     * @return  True if the array has duplicate points, false otherwise
      */
-    private void checkForNullOrRepeatedPoints(Point[] points) {
-        if (points == null || points[points.length - 1] == null) {
-            throw new IllegalArgumentException("Either the points array is null or the last point in the array is null");
-        }
+    private boolean hasDuplicate(Point[] points) {
         for (int i = 0; i < points.length - 1; i++) {
-            if (points[i] == null) throw new IllegalArgumentException();
-            for (int j = i + 1; j < points.length; j++) {
-                if (points[i].compareTo(points[j]) == 0) {
-                    throw new IllegalArgumentException("Two points in the array are the same.");
-                }
+            if (points[i].compareTo(points[i + 1]) == 0) {
+                return true;
             }
         }
+        return false;
+    }
+    
+    /**
+     * Checks every element in an array of points to see if any of them are null
+     * 
+     * @param points    Points array
+     * @return  True if the array has a null point, false otherwise
+     */
+    private boolean hasNullPoint(Point[] points) {
+        for (int i = 0; i < points.length; i++) {
+            if (points[i] == null){
+                return true;
+            }
+        }
+        return false;
     }
     
     public static void main(String[] args) {
