@@ -1,6 +1,10 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.StdDraw;
+import edu.princeton.cs.algs4.StdOut;
+
 /**
  * This program examines 4 points at a time and checks whether they all lie on the
  * same line segment (are collinear) and returns all such line segments.
@@ -17,19 +21,17 @@ public class BruteCollinearPoints {
     
     public BruteCollinearPoints(Point[] points) {
         checkForNullOrRepeatedPoints(points);
-        
         ArrayList<LineSegment> segments = new ArrayList<>();
-        
-        Point[] pointsSorted = Arrays.copyOf(points, points.length);
-        Arrays.sort(pointsSorted);
+        Arrays.sort(points);
         
         for (int p = 0; p < points.length - 3 ; p++) {
             for (int q = p + 1; q < points.length - 2; q++) {
                 for (int r = q + 1; r < points.length - 1; r++) {
                     for (int s = r + 1; s < points.length; s++) {
-                        if (pointsSorted[p].slopeTo(pointsSorted[q]) == pointsSorted[p].slopeTo(pointsSorted[r]) 
-                                && pointsSorted[p].slopeTo(pointsSorted[q]) == pointsSorted[p].slopeTo(pointsSorted[s])) {
-                            segments.add(new LineSegment(pointsSorted[p], pointsSorted[q]));
+                        if (points[p].slopeTo(points[q]) == points[p].slopeTo(points[r]) 
+                                && points[p].slopeTo(points[r]) == points[p].slopeTo(points[s])) {
+                            // how do we know if p and s are the opposite ends of the line segment? i'm not sure we do... maybe sorting fixed that?
+                            segments.add(new LineSegment(points[p], points[s]));
                         }
                     }
                 }
@@ -66,5 +68,35 @@ public class BruteCollinearPoints {
     
     public LineSegment[] segments() {
         return lineSegments;
+    }
+    
+    public static void main(String[] args) {
+
+        // read the n points from a file
+        In in = new In(args[0]);
+        int n = in.readInt();
+        Point[] points = new Point[n];
+        for (int i = 0; i < n; i++) {
+            int x = in.readInt();
+            int y = in.readInt();
+            points[i] = new Point(x, y);
+        }
+
+        // draw the points
+        StdDraw.enableDoubleBuffering();
+        StdDraw.setXscale(0, 32768);
+        StdDraw.setYscale(0, 32768);
+        for (Point p : points) {
+            p.draw();
+        }
+        StdDraw.show();
+
+        // print and draw the line segments
+        BruteCollinearPoints collinear = new BruteCollinearPoints(points);
+        for (LineSegment segment : collinear.segments()) {
+            StdOut.println(segment);
+            segment.draw();
+        }
+        StdDraw.show();
     }
 }
